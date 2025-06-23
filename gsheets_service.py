@@ -174,3 +174,47 @@ def guardar_nueva_agrupacion(area, nueva_agrupacion):
     except Exception as e:
         st.error(f"No se pudo guardar la nueva agrupación funcional: {e}")
         return False
+
+# FUNCIÓN ADICIONAL PARA LA NUEVA PESTAÑA
+def cargar_todos_objetivos():
+    """Carga todos los objetivos desde Google Sheets"""
+    try:
+        hoja = cargar_hoja_estado()
+        if hoja is None:
+            return pd.DataFrame()
+        
+        # Obtener todos los datos
+        data = hoja.get_all_records()
+        
+        if not data:
+            return pd.DataFrame()
+        
+        df = pd.DataFrame(data)
+        
+        # Limpiar y procesar datos
+        if not df.empty:
+            # Eliminar filas completamente vacías
+            df = df.dropna(how='all')
+            
+            # Limpiar espacios en blanco
+            string_columns = ['area', 'agrupacion', 'objetivo', 'indicador', 'responsable', 'estado']
+            for col in string_columns:
+                if col in df.columns:
+                    df[col] = df[col].astype(str).str.strip()
+            
+            # Filtrar filas con datos válidos
+            df = df[
+                (df['objetivo'].notna()) & 
+                (df['objetivo'] != '') & 
+                (df['objetivo'] != 'nan')
+            ]
+            
+            # Ordenar por timestamp (más recientes primero)
+            if 'timestamp' in df.columns:
+                df = df.sort_values('timestamp', ascending=False)
+        
+        return df
+        
+    except Exception as e:
+        st.error(f"Error cargando objetivos: {e}")
+        return pd.DataFrame()
