@@ -14,7 +14,7 @@ st.set_page_config(
 )
 
 # --- UI ---
-st.image("logo_ayuntamiento_azul.png", width=100)
+st.image("logo_ayuntamiento_azul.png", width=150)
 st.title("Objetivos de Productividad")
 st.markdown("---")
 
